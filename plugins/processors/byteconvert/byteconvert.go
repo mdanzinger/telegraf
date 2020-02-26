@@ -40,13 +40,29 @@ func (d *byteConvert) Init() error {
 func (d *byteConvert) Apply(in ...telegraf.Metric) []telegraf.Metric {
 	for _, point := range in {
 		if field, ok := point.GetField(d.FieldSrc); ok {
-			v := d.convert(float64(field.(int64)))
+			v := d.convert(toFloat64(field))
 			point.AddField(d.FieldName, v)
 		}
 
 	}
 
 	return in
+}
+
+func toFloat64(v interface{}) float64 {
+	switch i := v.(type) {
+	case float64:
+		return i
+	case float32:
+		return float64(i)
+	case int64:
+		return float64(i)
+	case int32:
+		return float64(i)
+	case int:
+		return float64(i)
+	}
+	return 0
 }
 
 func (d *byteConvert) convert(bytes float64) float64{

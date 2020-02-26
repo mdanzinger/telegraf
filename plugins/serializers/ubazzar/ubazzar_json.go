@@ -68,7 +68,6 @@ func (s *serializer) createObject(metric telegraf.Metric) *event {
 	if !ok {
 		startTime = time.Now().Add(time.Second*-5).Format(time.RFC3339)
 	}
-	quantity, _ := metric.GetField("quantity")
 
 
 	filteredTags := make(map[string]string)
@@ -86,13 +85,31 @@ func (s *serializer) createObject(metric telegraf.Metric) *event {
 		ServiceCustomerID: customerID,
 		Service:           service,
 		UnitOfMeasure:     unitOfMeasure,
-		Quantity:          quantity.(float64),
+		Quantity:          getQuantity(metric),
 		StartTime: startTime.(string),
 		EndTime:           metric.Time().Format(time.RFC3339),
 		MetaData: filteredTags,
 	}
 
 	return e
+}
+
+func getQuantity(metric telegraf.Metric) float64 {
+	if field, ok := metric.GetField("quantity"); ok {
+		switch i := field.(type) {
+		case float64:
+			return i
+		case float32:
+			return float64(i)
+		case int64:
+			return float64(i)
+		case int32:
+			return float64(i)
+		case int:
+			return float64(i)
+		}
+	}
+	return 0
 }
 
 func truncateDuration(units time.Duration) time.Duration {
