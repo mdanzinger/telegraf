@@ -12,7 +12,7 @@ service = "multiplay_billing"
   metric_batch_size = 1000
   metric_buffer_limit = 10000
   collection_jitter = "0s"
-  flush_interval = "30s"
+  flush_interval = "60s"
   flush_jitter = "0s"
   precision = ""
   hostname = ""
@@ -21,8 +21,8 @@ service = "multiplay_billing"
 
  [[outputs.file]] 
   files = ["stdout", "/tmp/metrics.out"]
-  data_format = "json"
-  namepass = ["net"]
+  data_format = "ubazzar"
+  fieldpass = ["quantity"]
 
 # Egress
  [[inputs.net]]
@@ -70,7 +70,6 @@ service = "multiplay_billing"
 
 ### CPU ###
 [[inputs.system]]
-interval = "30s"
 fieldpass = ["n_cpus"]
 [[inputs.system.tags]]
      unit_of_measure = "vcpu-eu-west"
